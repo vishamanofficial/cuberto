@@ -1,30 +1,30 @@
 /* eslint-disable no-unused-vars */
-import React from "react";
+import React, { useEffect } from "react";
+import { Routes, Route } from "react-router-dom";
+
 import LocomotiveScroll from "locomotive-scroll";
 import Navbar from "./components/Navbar";
-import LandingPage from "./components/LandingPage";
-import WhatWeDo from "./components/WhatWeDo";
-import FeaturedProject from "./components/FeaturedProject";
-import Philosophy from "./components/Philosophy";
-import Resources from "./components/Resources";
-import NewDay from "./components/NewDay";
-import FollowUs from "./components/FollowUs";
-import TellUs from "./components/TellUs";
+import Footer from "./components/Footer";
+import Home from "./pages/home/Home";
+import AvailableRooms from "./pages/hotel/AvailableRooms";
+import BookingConfirmation from "./pages/hotel/BookingConfirmation";
 
 const App = () => {
-  const locomotiveScroll = new LocomotiveScroll();
+  useEffect(() => {
+    const scroll = new LocomotiveScroll();
+  }, []);
+
   return (
-    <div className="w-full min-h-screen text-black bg-[#f1f1f1]">
+    <>
       <Navbar />
-      <LandingPage />
-      <WhatWeDo />
-      <FeaturedProject />
-      <Philosophy />
-      <Resources />
-      <NewDay />
-      <FollowUs />
-      <TellUs />
-    </div>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/available-rooms" element={<AvailableRooms />} />
+        {/* <Route path="/hotel/:id" element={<HotelDetails />} /> */}
+        <Route path="/booking-confirmation" element={<BookingConfirmation />} />
+      </Routes>
+      <Footer />
+    </>
   );
 };
 
