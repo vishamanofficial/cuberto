@@ -2,6 +2,9 @@ import React, { useEffect, useState, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { format } from "date-fns";
+import { DateRange } from "react-date-range";
+import "react-date-range/dist/styles.css";
+import "react-date-range/dist/theme/default.css";
 
 const isRoomAvailable = (room, startDate, endDate) => {
   return room.roomNumbers.some((roomNumber) =>
@@ -16,11 +19,14 @@ const isRoomAvailable = (room, startDate, endDate) => {
 const AvailableRooms = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { date, options } = location.state || {};
+  const sidebarRef = useRef();
+  const { date: initialDate, options: initialOptions } = location.state || {};
+
   const [rooms, setRooms] = useState([]);
   const [filteredRooms, setFilteredRooms] = useState([]);
-  const [selectedRoomNumbers, setSelectedRoomNumbers] = useState({});
-  const sidebarRef = useRef();
+  const [date, setDate] = useState(initialDate);
+  const [options, setOptions] = useState(initialOptions);
+  const [openDate, setOpenDate] = useState(false);
 
   useEffect(() => {
     const fetchRooms = async () => {
@@ -52,24 +58,28 @@ const AvailableRooms = () => {
   }, [rooms, date, options]);
 
   const handleBookNow = (room) => {
-    const selectedNumber = selectedRoomNumbers[room._id];
-    if (!selectedNumber) {
-      alert("Please select a room number");
-      return;
-    }
-
     navigate("/booking-confirmation", {
       state: {
         room,
         date,
         options,
-        roomNumber: selectedNumber,
       },
     });
   };
 
   const handleSearch = () => {
-    navigate("/available-rooms", { state: { date, options } });
+    const startDate = date[0].startDate;
+    const endDate = date[0].endDate;
+
+    const filtered = rooms.filter((room) => {
+      return (
+        room.isAvailable &&
+        room.maxPeople >= options.adult + options.children &&
+        isRoomAvailable(room, startDate, endDate)
+      );
+    });
+
+    setFilteredRooms(filtered);
   };
 
   return (
@@ -110,26 +120,6 @@ const AvailableRooms = () => {
                   ₹{room.price.toLocaleString("en-IN")} per night
                 </p>
 
-                <select
-                  value={selectedRoomNumbers[room._id] || ""}
-                  onChange={(e) =>
-                    setSelectedRoomNumbers((prev) => ({
-                      ...prev,
-                      [room._id]: e.target.value,
-                    }))
-                  }
-                  className="bg-black border border-white/30 text-white px-3 py-2 rounded mt-2"
-                >
-                  <option value="" disabled>
-                    Select room number
-                  </option>
-                  {room.roomNumbers.map((roomNum) => (
-                    <option key={roomNum._id} value={roomNum.number}>
-                      {roomNum.number}
-                    </option>
-                  ))}
-                </select>
-
                 <button
                   onClick={() => handleBookNow(room)}
                   className="mt-6 bg-[#FBD3AF] text-black px-6 py-2 rounded hover:bg-[#e5bb92] transition"
@@ -141,30 +131,65 @@ const AvailableRooms = () => {
           ))}
         </div>
 
-        <div className="bg-[#111] p-4 rounded-md border border-white/10 h-fit sticky top-8" ref={sidebarRef}>
-          <h3 className="text-lg font-semibold mb-6">Book Your Stay</h3>
-          <div className="space-y-4 text-sm">
-            <div>
-              <label className="block mb-1">Check-in:</label>
-              <div className="border px-3 py-2">
-                {format(date[0].startDate, "dd/MM/yyyy")}
+        {/* SIDEBAR FILTERS */}
+        <div
+          className="bg-[#111] p-4 rounded-md border border-white/10 h-fit sticky top-8"
+          ref={sidebarRef}
+        >
+          <h3 className="text-lg font-semibold mb-4">Modify Your Search</h3>
+
+          <div>
+            <label className="block mb-1">Date Range</label>
+            <div className="border px-3 py-2 bg-black text-white" onClick={() => setOpenDate(!openDate)}>
+              {`${format(date[0].startDate, "dd/MM/yyyy")} to ${format(date[0].endDate, "dd/MM/yyyy")}`}
+            </div>
+            {openDate && (
+              <div className="mt-2">
+                <DateRange
+                  editableDateInputs={true}
+                  onChange={(item) => setDate([item.selection])}
+                  moveRangeOnFirstSelection={false}
+                  ranges={date}
+                  minDate={new Date()}
+                />
               </div>
-            </div>
-            <div>
-              <label className="block mb-1">Check-out:</label>
-              <div className="border px-3 py-2">
-                {format(date[0].endDate, "dd/MM/yyyy")}
-              </div>
-            </div>
-            <div>
-              <label className="block mb-1">Adults:</label>
-              <div className="border px-3 py-2">{options.adult}</div>
-            </div>
-            <div>
-              <label className="block mb-1">Children:</label>
-              <div className="border px-3 py-2">{options.children}</div>
-            </div>
+            )}
           </div>
+
+          <div className="mt-4">
+            <label className="block mb-1">Adults</label>
+            <select
+              className="bg-black text-white border px-2 py-1 w-full"
+              value={options.adult}
+              onChange={(e) =>
+                setOptions((prev) => ({ ...prev, adult: +e.target.value }))
+              }
+            >
+              {[...Array(10).keys()].map((num) => (
+                <option key={num} value={num + 1}>
+                  {num + 1}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="mt-4">
+            <label className="block mb-1">Children</label>
+            <select
+              className="bg-black text-white border px-2 py-1 w-full"
+              value={options.children}
+              onChange={(e) =>
+                setOptions((prev) => ({ ...prev, children: +e.target.value }))
+              }
+            >
+              {[...Array(6).keys()].map((num) => (
+                <option key={num} value={num}>
+                  {num}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <button
             onClick={handleSearch}
             className="mt-6 w-full bg-white text-black py-2 font-semibold hover:bg-gray-200 transition"
