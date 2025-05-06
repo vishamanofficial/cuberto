@@ -40,8 +40,9 @@ const RoomShowcaseCarousel = () => {
               <div className="bg-black border border-gray-700 p-4 rounded-lg">
                 <img
                   src={
-                    room.image ||
-                    'https://via.placeholder.com/600x400?text=No+Image'
+                    room.images?.[0]
+                      ? `http://localhost:8800${room.images[0]}`
+                      : "https://images.pexels.com/photos/258154/pexels-photo-258154.jpeg"
                   }
                   alt={room.title}
                   className="w-full h-[300px] object-cover rounded-md"

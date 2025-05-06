@@ -111,8 +111,9 @@ const AvailableRooms = () => {
             >
               <img
                 src={
-                  room.images?.[0] ||
-                  "https://images.pexels.com/photos/258154/pexels-photo-258154.jpeg"
+                  room.images?.[0]
+                    ? `http://localhost:8800${room.images[0]}`
+                    : "https://images.pexels.com/photos/258154/pexels-photo-258154.jpeg"
                 }
                 alt={room.title}
                 className="w-full h-[300px] object-cover rounded-md"
