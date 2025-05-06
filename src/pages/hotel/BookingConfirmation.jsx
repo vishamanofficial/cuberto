@@ -1,12 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import axios from "axios";
+import { AuthContext } from "../../context/AuthContext";
 
 const BookingConfirmation = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { room, date, options, roomNumber } = location.state || {};
+  const { room, date, options } = location.state || {};
+
+  const { currentUser } = useContext(AuthContext);
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -34,25 +37,27 @@ const BookingConfirmation = () => {
 
     try {
       const totalPrice = room.price;
-      await axios.post(
+
+      const res = await axios.post(
         "http://localhost:8800/api/bookings",
         {
           roomId: room._id,
-          roomNumber, // ✅ new field
           startDate: format(date[0].startDate, "yyyy-MM-dd"),
           endDate: format(date[0].endDate, "yyyy-MM-dd"),
           totalPrice,
         },
         {
-          headers: { token: "Bearer " + localStorage.getItem("token") },
-          withCredentials: true,
+          withCredentials: true, // ✅ Only this is needed for cookie auth
         }
       );
+
       alert("Booking Confirmed!");
       navigate("/");
     } catch (err) {
       console.error("Booking failed", err);
-      alert("Something went wrong");
+      alert(
+        err?.response?.data?.message || "Something went wrong during booking"
+      );
     }
   };
 
@@ -64,10 +69,10 @@ const BookingConfirmation = () => {
 
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
         <div className="md:col-span-3 space-y-2">
+          {/* Summary */}
           <div className="bg-[#111] p-6 rounded-md">
             <h3 className="text-xl font-semibold mb-4">Booking Summary</h3>
             <p><strong>Room:</strong> {room.title}</p>
-            <p><strong>Room Number:</strong> {roomNumber}</p>
             <p><strong>Check-in:</strong> {format(date[0].startDate, "MMMM dd, yyyy")} from 11:00 AM</p>
             <p><strong>Check-out:</strong> {format(date[0].endDate, "MMMM dd, yyyy")} until 10:00 AM</p>
             <p><strong>Guests:</strong> {options.adult} Adults, {options.children} Children</p>
@@ -76,6 +81,7 @@ const BookingConfirmation = () => {
             </p>
           </div>
 
+          {/* Guest Details */}
           <div className="bg-[#111] p-6 rounded-md">
             <h3 className="text-xl font-semibold mb-4">Guest Information</h3>
             <input name="fullName" placeholder="Full Name *" onChange={handleChange} className="w-full p-2 bg-black border border-white mb-4" />
@@ -95,8 +101,8 @@ const BookingConfirmation = () => {
           </div>
         </div>
 
+        {/* Sidebar */}
         <div className="bg-[#111] p-4 rounded-md border border-white/10 h-fit sticky top-8">
-
           <div className="mb-6">
             <h3 className="text-lg font-semibold mb-2">Questions about booking?</h3>
             <p className="text-sm">Tel: +44 345 3456</p>
@@ -112,8 +118,6 @@ const BookingConfirmation = () => {
             <p className="text-sm">Sosnova Street, 1</p>
           </div>
         </div>
-
-        
       </div>
     </div>
   );

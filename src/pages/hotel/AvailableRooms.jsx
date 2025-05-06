@@ -1,10 +1,12 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useContext } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { format } from "date-fns";
 import { DateRange } from "react-date-range";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
+import { AuthContext } from "../../context/AuthContext.jsx";
+import AuthModal from "../../components/AuthModal";
 
 const isRoomAvailable = (room, startDate, endDate) => {
   return room.roomNumbers.some((roomNumber) =>
@@ -20,6 +22,7 @@ const AvailableRooms = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const sidebarRef = useRef();
+  const { currentUser } = useContext(AuthContext);
   const { date: initialDate, options: initialOptions } = location.state || {};
 
   const [rooms, setRooms] = useState([]);
@@ -27,6 +30,7 @@ const AvailableRooms = () => {
   const [date, setDate] = useState(initialDate);
   const [options, setOptions] = useState(initialOptions);
   const [openDate, setOpenDate] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   useEffect(() => {
     const fetchRooms = async () => {
@@ -58,6 +62,11 @@ const AvailableRooms = () => {
   }, [rooms, date, options]);
 
   const handleBookNow = (room) => {
+    if (!currentUser) {
+      setShowAuthModal(true);
+      return;
+    }
+
     navigate("/booking-confirmation", {
       state: {
         room,
@@ -96,7 +105,10 @@ const AvailableRooms = () => {
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
         <div className="md:col-span-3 space-y-16">
           {filteredRooms.map((room) => (
-            <div key={room._id} className="border border-white/20 p-6 rounded-md bg-[#0d0d0d] shadow-md">
+            <div
+              key={room._id}
+              className="border border-white/20 p-6 rounded-md bg-[#0d0d0d] shadow-md"
+            >
               <img
                 src={
                   room.images?.[0] ||
@@ -113,7 +125,9 @@ const AvailableRooms = () => {
                 <ul className="mt-4 text-sm text-white/80 space-y-1 list-disc list-inside">
                   <li>Max Guests: {room.maxPeople}</li>
                   <li>Bed Type: {room.bedType || "N/A"}</li>
-                  <li>Amenities: {room.amenities?.join(", ") || "Not specified"}</li>
+                  <li>
+                    Amenities: {room.amenities?.join(", ") || "Not specified"}
+                  </li>
                 </ul>
 
                 <p className="mt-4 text-lg text-[#FBD3AF] font-semibold">
@@ -131,7 +145,7 @@ const AvailableRooms = () => {
           ))}
         </div>
 
-        {/* SIDEBAR FILTERS */}
+        {/* Sidebar Filters */}
         <div
           className="bg-[#111] p-4 rounded-md border border-white/10 h-fit sticky top-8"
           ref={sidebarRef}
@@ -140,8 +154,14 @@ const AvailableRooms = () => {
 
           <div>
             <label className="block mb-1">Date Range</label>
-            <div className="border px-3 py-2 bg-black text-white" onClick={() => setOpenDate(!openDate)}>
-              {`${format(date[0].startDate, "dd/MM/yyyy")} to ${format(date[0].endDate, "dd/MM/yyyy")}`}
+            <div
+              className="border px-3 py-2 bg-black text-white"
+              onClick={() => setOpenDate(!openDate)}
+            >
+              {`${format(date[0].startDate, "dd/MM/yyyy")} to ${format(
+                date[0].endDate,
+                "dd/MM/yyyy"
+              )}`}
             </div>
             {openDate && (
               <div className="mt-2">
@@ -198,6 +218,8 @@ const AvailableRooms = () => {
           </button>
         </div>
       </div>
+
+      {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
     </div>
   );
 };
