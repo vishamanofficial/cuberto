@@ -1,4 +1,4 @@
-// ✅ Room field removed, design preserved
+// ✅ UPDATED LANDING PAGE WITHOUT CHILDREN FIELD
 import React, { useState, useRef, useEffect } from "react";
 import { DateRange } from "react-date-range";
 import { format } from "date-fns";
@@ -17,7 +17,7 @@ const LandingPage = () => {
 
   const [options, setOptions] = useState({
     adult: 1,
-    children: 0,
+    rooms: 1,
   });
 
   const [openDate, setOpenDate] = useState(false);
@@ -118,20 +118,20 @@ const LandingPage = () => {
             </div>
           </div>
 
-          {/* Children */}
+          {/* Rooms */}
           <div className="w-full">
-            <label className="block text-sm text-white mb-2">Children</label>
+            <label className="block text-sm text-white mb-2">Rooms</label>
             <div className="border border-white px-2 py-2">
               <select
                 className="bg-transparent text-white w-full outline-none"
-                value={options.children}
+                value={options.rooms}
                 onChange={(e) =>
-                  setOptions((prev) => ({ ...prev, children: +e.target.value }))
+                  setOptions((prev) => ({ ...prev, rooms: +e.target.value }))
                 }
               >
-                {[...Array(6).keys()].map((num) => (
-                  <option key={num} value={num} className="text-black">
-                    {num}
+                {[...Array(5).keys()].map((num) => (
+                  <option key={num} value={num + 1} className="text-black">
+                    {num + 1}
                   </option>
                 ))}
               </select>

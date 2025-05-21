@@ -62,7 +62,7 @@ function Navbar() {
         <div className="hidden md:block">
           {currentUser ? (
             <div className="flex items-center gap-4">
-              <span className="text-sm">Hello, {currentUser.username}</span>
+              <span className="text-sm">Hello, {currentUser.fullName}</span>
               <button onClick={handleLogout} className="uppercase text-sm tracking-widest">
                 Logout
               </button>

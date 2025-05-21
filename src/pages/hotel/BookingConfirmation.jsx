@@ -1,14 +1,15 @@
+// ✅ UPDATED BookingConfirmation.jsx — Production-grade with toast and validation
 import React, { useState, useContext } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import axios from "axios";
+import toast, { Toaster } from "react-hot-toast";
 import { AuthContext } from "../../context/AuthContext";
 
 const BookingConfirmation = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { room, date, options } = location.state || {};
-
   const { currentUser } = useContext(AuthContext);
 
   const [formData, setFormData] = useState({
@@ -29,59 +30,74 @@ const BookingConfirmation = () => {
     }));
   };
 
+  const normalizeDate = (d) => {
+    const date = new Date(d);
+    date.setUTCHours(0, 0, 0, 0);
+    return date;
+  };
+
+  const getAllDatesInRange = (start, end) => {
+    const dates = [];
+    const current = new Date(start);
+    while (current <= end) {
+      dates.push(new Date(current));
+      current.setDate(current.getDate() + 1);
+    }
+    return dates;
+  };
+
   const handleSubmit = async () => {
+    if (!formData.fullName || !formData.email || !formData.phone || !formData.country) {
+      toast.error("Please fill all guest information fields");
+      return;
+    }
     if (!formData.termsAccepted) {
-      alert("Please accept terms & conditions");
+      toast.error("Please accept terms & conditions");
       return;
     }
 
     try {
       const totalPrice = room.price;
+      const start = normalizeDate(date[0].startDate);
+      const end = normalizeDate(date[0].endDate);
+      const bookingDates = getAllDatesInRange(start, end);
 
       const res = await axios.post(
         "http://localhost:8800/api/bookings",
         {
           roomId: room._id,
-          startDate: format(date[0].startDate, "yyyy-MM-dd"),
-          endDate: format(date[0].endDate, "yyyy-MM-dd"),
+          startDate: start,
+          endDate: end,
           totalPrice,
         },
-        {
-          withCredentials: true, // ✅ Only this is needed for cookie auth
-        }
+        { withCredentials: true }
       );
 
-      alert("Booking Confirmed!");
+      toast.success("Booking Confirmed!");
       navigate("/");
     } catch (err) {
       console.error("Booking failed", err);
-      alert(
-        err?.response?.data?.message || "Something went wrong during booking"
-      );
+      toast.error(err?.response?.data?.message || "Something went wrong during booking");
     }
   };
 
   return (
     <div className="min-h-screen bg-black text-white px-6 md:px-12 py-10">
-      <h2 className="text-3xl font-semibold text-center mb-6 mt-14">
-        Booking Confirmation
-      </h2>
+      <Toaster position="top-right" />
+      <h2 className="text-3xl font-semibold text-center mb-6 mt-14">Booking Confirmation</h2>
 
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
         <div className="md:col-span-3 space-y-2">
-          {/* Summary */}
           <div className="bg-[#111] p-6 rounded-md">
             <h3 className="text-xl font-semibold mb-4">Booking Summary</h3>
             <p><strong>Room:</strong> {room.title}</p>
             <p><strong>Check-in:</strong> {format(date[0].startDate, "MMMM dd, yyyy")} from 11:00 AM</p>
             <p><strong>Check-out:</strong> {format(date[0].endDate, "MMMM dd, yyyy")} until 10:00 AM</p>
-            <p><strong>Guests:</strong> {options.adult} Adults, {options.children} Children</p>
-            <p className="mt-4 text-lg font-semibold text-[#FBD3AF]">
-              Total Price: ₹{room.price.toLocaleString("en-IN")}
-            </p>
+            <p><strong>Guests:</strong> {options.adult} Adults</p>
+            <p><strong>Rooms:</strong> {options.rooms}</p>
+            <p className="mt-4 text-lg font-semibold text-[#FBD3AF]">Total Price: ₹{room.price.toLocaleString("en-IN")} per night</p>
           </div>
 
-          {/* Guest Details */}
           <div className="bg-[#111] p-6 rounded-md">
             <h3 className="text-xl font-semibold mb-4">Guest Information</h3>
             <input name="fullName" placeholder="Full Name *" onChange={handleChange} className="w-full p-2 bg-black border border-white mb-4" />
@@ -101,7 +117,6 @@ const BookingConfirmation = () => {
           </div>
         </div>
 
-        {/* Sidebar */}
         <div className="bg-[#111] p-4 rounded-md border border-white/10 h-fit sticky top-8">
           <div className="mb-6">
             <h3 className="text-lg font-semibold mb-2">Questions about booking?</h3>
