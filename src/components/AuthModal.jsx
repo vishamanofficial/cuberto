@@ -1,4 +1,3 @@
-// ✅ UPDATED AuthModal.jsx — Production-grade authentication modal
 import React, { useState, useContext } from "react";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
@@ -33,7 +32,6 @@ const AuthModal = ({ onClose }) => {
       setOtpSent(true);
       toast.success("OTP sent to email");
     } catch (err) {
-      // console.error(err);
       toast.error("Failed to send OTP");
     }
   };
@@ -45,19 +43,18 @@ const AuthModal = ({ onClose }) => {
         otp: formData.otp,
       });
 
-      const res = await axios.post(
-        "http://localhost:8800/api/auth/register",
-        formData,
-        {
-          withCredentials: true,
-        }
-      );
+      await axios.post("http://localhost:8800/api/auth/register", formData, {
+        withCredentials: true,
+      });
 
-      setCurrentUser(res.data);
+      // ✅ Fetch current user after registration to ensure correct _id
+      const userRes = await axios.get("http://localhost:8800/api/users/me", {
+        withCredentials: true,
+      });
+      setCurrentUser(userRes.data);
       toast.success("Signup successful");
       onClose();
     } catch (err) {
-      // console.error(err);
       if (err.response?.status === 409) {
         toast.error("User already exists with this email or phone number.");
       } else {
@@ -72,11 +69,13 @@ const AuthModal = ({ onClose }) => {
       return toast.error("Please enter both email and password");
 
     try {
-      const res = await axios.post(
+      await axios.post(
         "http://localhost:8800/api/auth/login",
         { email, password },
         { withCredentials: true }
       );
+
+      // ✅ Always get fresh user from backend
       const userRes = await axios.get("http://localhost:8800/api/users/me", {
         withCredentials: true,
       });
@@ -84,7 +83,6 @@ const AuthModal = ({ onClose }) => {
       toast.success("Login successful");
       onClose();
     } catch (err) {
-      // console.error(err);
       toast.error("Login failed");
     }
   };
@@ -101,7 +99,11 @@ const AuthModal = ({ onClose }) => {
         </button>
 
         <h2 className="text-2xl font-bold text-center mb-6 text-[#FBD3AF]">
-          {mode === "login" ? "Login" : otpSent ? "Verify OTP" : "Sign Up"}
+          {mode === "login"
+            ? "Login"
+            : mode === "signup" && !otpSent
+            ? "Sign Up"
+            : "Verify OTP"}
         </h2>
 
         {mode === "login" && (
@@ -110,14 +112,14 @@ const AuthModal = ({ onClose }) => {
               name="email"
               placeholder="Email"
               onChange={handleChange}
-              className="w-full bg-transparent text-white placeholder-gray-400 border border-[#FBD3AF] px-4 py-3 mb-4 rounded-md focus:outline-none focus:ring-2 focus:ring-[#FBD3AF]"
+              className="w-full bg-transparent text-white placeholder-gray-400 border border-[#FBD3AF] px-4 py-3 mb-4 rounded-md"
             />
             <input
               name="password"
               type="password"
               placeholder="Password"
               onChange={handleChange}
-              className="w-full bg-transparent text-white placeholder-gray-400 border border-[#FBD3AF] px-4 py-3 mb-6 rounded-md focus:outline-none focus:ring-2 focus:ring-[#FBD3AF]"
+              className="w-full bg-transparent text-white placeholder-gray-400 border border-[#FBD3AF] px-4 py-3 mb-6 rounded-md"
             />
             <button
               onClick={handleLogin}
@@ -137,32 +139,32 @@ const AuthModal = ({ onClose }) => {
           </>
         )}
 
-        {mode === "signup" && (
+        {mode === "signup" && !otpSent && (
           <>
             <input
               name="fullName"
               placeholder="Full Name"
               onChange={handleChange}
-              className="w-full bg-transparent text-white placeholder-gray-400 border border-[#FBD3AF] px-4 py-3 mb-3 rounded-md focus:outline-none focus:ring-2 focus:ring-[#FBD3AF]"
+              className="input"
             />
             <input
               name="email"
               placeholder="Email"
               onChange={handleChange}
-              className="w-full bg-transparent text-white placeholder-gray-400 border border-[#FBD3AF] px-4 py-3 mb-3 rounded-md focus:outline-none focus:ring-2 focus:ring-[#FBD3AF]"
+              className="input"
             />
             <input
               name="phone"
               placeholder="Phone Number"
               onChange={handleChange}
-              className="w-full bg-transparent text-white placeholder-gray-400 border border-[#FBD3AF] px-4 py-3 mb-3 rounded-md focus:outline-none focus:ring-2 focus:ring-[#FBD3AF]"
+              className="input"
             />
             <input
               name="password"
               type="password"
               placeholder="Password"
               onChange={handleChange}
-              className="w-full bg-transparent text-white placeholder-gray-400 border border-[#FBD3AF] px-4 py-3 mb-4 rounded-md focus:outline-none focus:ring-2 focus:ring-[#FBD3AF]"
+              className="input"
             />
             <button
               onClick={handleSendOtp}
@@ -182,13 +184,13 @@ const AuthModal = ({ onClose }) => {
           </>
         )}
 
-        {otpSent && mode === "signup" && (
+        {mode === "signup" && otpSent && (
           <>
             <input
               name="otp"
               placeholder="Enter OTP"
               onChange={handleChange}
-              className="w-full bg-transparent text-white placeholder-gray-400 border border-[#FBD3AF] px-4 py-3 mt-5 mb-4 rounded-md focus:outline-none focus:ring-2 focus:ring-[#FBD3AF]"
+              className="input mt-5 mb-4"
             />
             <button
               onClick={handleVerifyOtpAndRegister}

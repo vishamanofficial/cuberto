@@ -2,14 +2,12 @@
 import { createContext, useState, useEffect } from "react";
 import axios from "axios";
 
-// Create the context
 export const AuthContext = createContext();
 
-// Provide the context
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
+  const [loading, setLoading] = useState(true); // ✅ NEW
 
-  // Optional: Load user from backend on refresh
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -18,14 +16,16 @@ export const AuthProvider = ({ children }) => {
         });
         setCurrentUser(res.data);
       } catch (err) {
-        console.log("No user session");
+        setCurrentUser(null);
+      } finally {
+        setLoading(false); // ✅ Done loading
       }
     };
     fetchUser();
   }, []);
 
   return (
-    <AuthContext.Provider value={{ currentUser, setCurrentUser }}>
+    <AuthContext.Provider value={{ currentUser, setCurrentUser, loading }}>
       {children}
     </AuthContext.Provider>
   );

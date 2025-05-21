@@ -46,40 +46,45 @@ const BookingConfirmation = () => {
     return dates;
   };
 
-  const handleSubmit = async () => {
-    if (!formData.fullName || !formData.email || !formData.phone || !formData.country) {
-      toast.error("Please fill all guest information fields");
-      return;
-    }
-    if (!formData.termsAccepted) {
-      toast.error("Please accept terms & conditions");
-      return;
-    }
+const handleSubmit = async () => {
+  if (!formData.fullName || !formData.email || !formData.phone || !formData.country) {
+    toast.error("Please fill all guest information fields");
+    return;
+  }
+  if (!formData.termsAccepted) {
+    toast.error("Please accept terms & conditions");
+    return;
+  }
 
-    try {
-      const totalPrice = room.price;
-      const start = normalizeDate(date[0].startDate);
-      const end = normalizeDate(date[0].endDate);
-      const bookingDates = getAllDatesInRange(start, end);
+  try {
+    const totalPrice = room.price;
+    const start = normalizeDate(date[0].startDate);
+    const end = normalizeDate(date[0].endDate);
+    const bookingDates = getAllDatesInRange(start, end);
 
-      const res = await axios.post(
-        "http://localhost:8800/api/bookings",
-        {
-          roomId: room._id,
-          startDate: start,
-          endDate: end,
-          totalPrice,
-        },
-        { withCredentials: true }
-      );
+    const res = await axios.post(
+      "http://localhost:8800/api/bookings",
+      {
+        roomId: room._id,
+        startDate: start,
+        endDate: end,
+        totalPrice,
+      },
+      { withCredentials: true }
+    );
 
-      toast.success("Booking Confirmed!");
-      navigate("/");
-    } catch (err) {
-      console.error("Booking failed", err);
-      toast.error(err?.response?.data?.message || "Something went wrong during booking");
-    }
-  };
+    toast.success("Booking Confirmed! Redirecting...");
+    
+    // ✅ Delay redirect to show success message
+    setTimeout(() => {
+      navigate("/my-bookings");
+    }, 2500); // wait 2.5 seconds
+  } catch (err) {
+    console.error("Booking failed", err);
+    toast.error(err?.response?.data?.message || "Something went wrong during booking");
+  }
+};
+
 
   return (
     <div className="min-h-screen bg-black text-white px-6 md:px-12 py-10">
