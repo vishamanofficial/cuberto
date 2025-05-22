@@ -4,7 +4,8 @@ import toast, { Toaster } from "react-hot-toast";
 import { AuthContext } from "../context/AuthContext.jsx";
 
 const AuthModal = ({ onClose }) => {
-  const [mode, setMode] = useState("login");
+  const [mode, setMode] = useState("login"); // login | signup | forgot
+  const [signupStep, setSignupStep] = useState(1); // Step 1, 2, 3 for signup
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -13,6 +14,7 @@ const AuthModal = ({ onClose }) => {
     otp: "",
   });
   const [otpSent, setOtpSent] = useState(false);
+  const [isOtpVerified, setIsOtpVerified] = useState(false);
   const { setCurrentUser } = useContext(AuthContext);
 
   const handleChange = (e) => {
@@ -21,36 +23,48 @@ const AuthModal = ({ onClose }) => {
   };
 
   const handleSendOtp = async () => {
-    const { fullName, email, phone, password } = formData;
-    if (!fullName || !email || !phone || !password) {
-      return toast.error("Please fill in all fields before requesting OTP.");
+    if (!formData.fullName || !formData.email || !formData.phone || !formData.password) {
+      return toast.error("Please fill all fields");
     }
     try {
       await axios.post("http://localhost:8800/api/auth/send-otp", {
-        contact: email,
+        contact: formData.email,
       });
       setOtpSent(true);
+      setSignupStep(3);
       toast.success("OTP sent to email");
     } catch (err) {
-      toast.error("Failed to send OTP");
+      toast.error(err.response?.data?.message || "Failed to send OTP");
     }
   };
 
-  const handleVerifyOtpAndRegister = async () => {
+  const handleVerifyOtp = async () => {
     try {
-      await axios.post("http://localhost:8800/api/auth/verify-otp", {
+      const res = await axios.post("http://localhost:8800/api/auth/verify-otp", {
         contact: formData.email,
         otp: formData.otp,
       });
+      if (res.status === 200) {
+        setIsOtpVerified(true);
+        toast.success("OTP verified");
+        await handleRegister();
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Invalid OTP");
+    }
+  };
 
-      await axios.post("http://localhost:8800/api/auth/register", formData, {
+  const handleRegister = async () => {
+    try {
+      const { otp, ...formWithoutOtp } = formData;
+      await axios.post("http://localhost:8800/api/auth/register", formWithoutOtp, {
         withCredentials: true,
       });
 
-      // ✅ Fetch current user after registration to ensure correct _id
       const userRes = await axios.get("http://localhost:8800/api/users/me", {
         withCredentials: true,
       });
+
       setCurrentUser(userRes.data);
       toast.success("Signup successful");
       onClose();
@@ -58,8 +72,28 @@ const AuthModal = ({ onClose }) => {
       if (err.response?.status === 409) {
         toast.error("User already exists with this email or phone number.");
       } else {
-        toast.error("OTP verification or signup failed");
+        toast.error(err.response?.data?.message || "Signup failed");
       }
+    }
+  };
+
+  const handleResetPassword = async () => {
+    const { email, otp, password } = formData;
+    if (!email || !otp || !password)
+      return toast.error("All fields are required");
+
+    try {
+      await axios.post("http://localhost:8800/api/auth/reset-password", {
+        contact: email,
+        otp,
+        newPassword: password,
+      });
+
+      toast.success("Password reset successful");
+      setMode("login");
+      resetForm();
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Reset failed");
     }
   };
 
@@ -69,13 +103,10 @@ const AuthModal = ({ onClose }) => {
       return toast.error("Please enter both email and password");
 
     try {
-      await axios.post(
-        "http://localhost:8800/api/auth/login",
-        { email, password },
-        { withCredentials: true }
-      );
+      await axios.post("http://localhost:8800/api/auth/login", { email, password }, {
+        withCredentials: true,
+      });
 
-      // ✅ Always get fresh user from backend
       const userRes = await axios.get("http://localhost:8800/api/users/me", {
         withCredentials: true,
       });
@@ -87,10 +118,17 @@ const AuthModal = ({ onClose }) => {
     }
   };
 
+  const resetForm = () => {
+    setFormData({ fullName: "", email: "", phone: "", password: "", otp: "" });
+    setOtpSent(false);
+    setIsOtpVerified(false);
+    setSignupStep(1);
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-70 z-[2000] flex items-center justify-center">
       <Toaster position="top-right" />
-      <div className="bg-black text-white rounded-xl shadow-xl w-[90%] max-w-md px-6 py-8 relative border border-[#FBD3AF]">
+      <div className="bg-black text-white rounded-2xl shadow-2xl w-[90%] max-w-md px-8 py-10 border border-[#FBD3AF] relative max-h-[90vh] overflow-y-auto">
         <button
           className="absolute top-3 right-4 text-[#FBD3AF] text-2xl hover:scale-110 transition"
           onClick={onClose}
@@ -98,111 +136,131 @@ const AuthModal = ({ onClose }) => {
           &times;
         </button>
 
-        <h2 className="text-2xl font-bold text-center mb-6 text-[#FBD3AF]">
-          {mode === "login"
-            ? "Login"
-            : mode === "signup" && !otpSent
-            ? "Sign Up"
-            : "Verify OTP"}
+        <h2 className="text-3xl font-bold text-center mb-6 text-[#FBD3AF]">
+          {mode === "login" ? "Login" : mode === "signup" ? "Sign Up" : "Reset Password"}
         </h2>
 
-        {mode === "login" && (
-          <>
-            <input
-              name="email"
-              placeholder="Email"
-              onChange={handleChange}
-              className="w-full bg-transparent text-white placeholder-gray-400 border border-[#FBD3AF] px-4 py-3 mb-4 rounded-md"
-            />
-            <input
-              name="password"
-              type="password"
-              placeholder="Password"
-              onChange={handleChange}
-              className="w-full bg-transparent text-white placeholder-gray-400 border border-[#FBD3AF] px-4 py-3 mb-6 rounded-md"
-            />
-            <button
-              onClick={handleLogin}
-              className="w-full py-3 bg-[#FBD3AF] text-black font-semibold rounded-md hover:opacity-90 transition"
-            >
-              Login
-            </button>
-            <p className="text-sm mt-4 text-center text-gray-300">
-              Don’t have an account?{" "}
-              <span
-                onClick={() => setMode("signup")}
-                className="text-[#FBD3AF] font-medium cursor-pointer hover:underline"
-              >
-                Sign Up
-              </span>
-            </p>
-          </>
-        )}
+        <div className="space-y-4">
+          {mode === "login" && (
+            <>
+              <Input name="email" placeholder="Email" onChange={handleChange} />
+              <Input name="password" type="password" placeholder="Password" onChange={handleChange} />
+              <Button onClick={handleLogin} text="Login" />
 
-        {mode === "signup" && !otpSent && (
-          <>
-            <input
-              name="fullName"
-              placeholder="Full Name"
-              onChange={handleChange}
-              className="input"
-            />
-            <input
-              name="email"
-              placeholder="Email"
-              onChange={handleChange}
-              className="input"
-            />
-            <input
-              name="phone"
-              placeholder="Phone Number"
-              onChange={handleChange}
-              className="input"
-            />
-            <input
-              name="password"
-              type="password"
-              placeholder="Password"
-              onChange={handleChange}
-              className="input"
-            />
-            <button
-              onClick={handleSendOtp}
-              className="w-full py-3 bg-[#FBD3AF] text-black font-semibold rounded-md hover:opacity-90 transition"
-            >
-              Send OTP
-            </button>
-            <p className="text-sm mt-4 text-center text-gray-300">
-              Already have an account?{" "}
-              <span
-                onClick={() => setMode("login")}
-                className="text-[#FBD3AF] font-medium cursor-pointer hover:underline"
+              <p
+                className="text-sm text-right text-[#FBD3AF] cursor-pointer hover:underline"
+                onClick={() => {
+                  setMode("forgot");
+                  resetForm();
+                }}
               >
-                Login
-              </span>
-            </p>
-          </>
-        )}
+                Forgot Password?
+              </p>
 
-        {mode === "signup" && otpSent && (
-          <>
-            <input
-              name="otp"
-              placeholder="Enter OTP"
-              onChange={handleChange}
-              className="input mt-5 mb-4"
-            />
-            <button
-              onClick={handleVerifyOtpAndRegister}
-              className="w-full py-3 bg-[#FBD3AF] text-black font-semibold rounded-md hover:opacity-90 transition"
-            >
-              Verify OTP & Sign Up
-            </button>
-          </>
-        )}
+              <SwitchMode
+                text="Don’t have an account?"
+                action="Sign Up"
+                onClick={() => {
+                  setMode("signup");
+                  resetForm();
+                }}
+              />
+            </>
+          )}
+
+          {mode === "signup" && (
+            <>
+              {signupStep === 1 && (
+                <>
+                  <Input name="fullName" placeholder="Full Name" onChange={handleChange} />
+                  <Input name="email" placeholder="Email" onChange={handleChange} />
+                  <Input name="phone" placeholder="Phone Number" onChange={handleChange} />
+                  <Input name="password" type="password" placeholder="Password" onChange={handleChange} />
+                  <Button onClick={() => setSignupStep(2)} text="Next" />
+                </>
+              )}
+              {signupStep === 2 && (
+                <>
+                  <p className="text-sm text-gray-300">We’ll send an OTP to <b>{formData.email}</b></p>
+                  <Button onClick={handleSendOtp} text="Send OTP" />
+                  <Button onClick={() => setSignupStep(1)} text="Back" />
+                </>
+              )}
+              {signupStep === 3 && (
+                <>
+                  <Input name="otp" placeholder="Enter OTP" onChange={handleChange} />
+                  <Button onClick={handleVerifyOtp} text="Verify OTP & Register" disabled={!otpSent} />
+                  <Button onClick={() => setSignupStep(2)} text="Back" />
+                </>
+              )}
+
+              <SwitchMode
+                text="Already have an account?"
+                action="Login"
+                onClick={() => {
+                  setMode("login");
+                  resetForm();
+                }}
+              />
+            </>
+          )}
+
+          {mode === "forgot" && (
+            <>
+              <Input name="email" placeholder="Email" onChange={handleChange} />
+              <Button onClick={handleSendOtp} text="Send OTP" />
+              <Input name="otp" placeholder="Enter OTP" onChange={handleChange} />
+              <Input name="password" type="password" placeholder="New Password" onChange={handleChange} />
+              <Button onClick={handleResetPassword} text="Reset Password" disabled={!otpSent} />
+
+              <SwitchMode
+                text="Back to"
+                action="Login"
+                onClick={() => {
+                  setMode("login");
+                  resetForm();
+                }}
+              />
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
 };
+
+const Input = ({ name, placeholder, type = "text", onChange }) => (
+  <input
+    name={name}
+    type={type}
+    placeholder={placeholder}
+    onChange={onChange}
+    className="w-full py-3 px-4 bg-transparent text-white border border-[#FBD3AF] rounded-md placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FBD3AF] transition"
+  />
+);
+
+const Button = ({ onClick, text, color = "#FBD3AF", disabled = false }) => (
+  <button
+    onClick={onClick}
+    disabled={disabled}
+    className={`w-full py-3 text-black font-semibold rounded-md transition ${
+      disabled ? "bg-gray-600 cursor-not-allowed" : `bg-[${color}] hover:opacity-90`
+    }`}
+  >
+    {text}
+  </button>
+);
+
+const SwitchMode = ({ text, action, onClick }) => (
+  <p className="text-sm mt-4 text-center text-gray-300">
+    {text}{" "}
+    <span
+      onClick={onClick}
+      className="text-[#FBD3AF] font-medium cursor-pointer hover:underline"
+    >
+      {action}
+    </span>
+  </p>
+);
 
 export default AuthModal;

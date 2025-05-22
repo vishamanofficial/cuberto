@@ -13,6 +13,7 @@ import UserProfile from "./components/UserProfile";
 import UserBookings from "./components/UserBookings";
 import RoomDetails from "./pages/hotel/RoomDetails";
 import BookYourStay from "./components/BookYourStay";
+import BlogDetails from "./components/BlogDetails"; // ✅ import added
 
 const App = () => {
   useEffect(() => {
@@ -27,6 +28,7 @@ const App = () => {
         <Route path="/available-rooms" element={<AvailableRooms />} />
         <Route path="/rooms/:id" element={<RoomDetails />} />
         <Route path="/book-your-stay" element={<BookYourStay />} />
+        <Route path="/blogs/:slug" element={<BlogDetails />} />
         <Route
           path="/booking-confirmation"
           element={
@@ -51,6 +53,7 @@ const App = () => {
             </ProtectedRoute>
           }
         />
+
       </Routes>
       <Footer />
     </>

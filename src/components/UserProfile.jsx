@@ -42,9 +42,22 @@ const UserProfile = () => {
       toast.success("Profile updated successfully");
       setEditMode(false);
     } catch (err) {
-      toast.error(
-        err.response?.data?.message || "Profile update failed"
-      );
+      const fallbackMessage = "Profile update failed";
+
+      const message =
+        err.response?.data?.message || // custom backend message
+        err.response?.data?.errmsg || // MongoDB error
+        err.message || // axios/fetch native error
+        fallbackMessage;
+
+      // 🧠 Smart field-specific toast
+      if (message.toLowerCase().includes("email")) {
+        toast.error("This email is already used");
+      } else if (message.toLowerCase().includes("phone")) {
+        toast.error("This phone number already exists");
+      } else {
+        toast.error(message);
+      }
     }
   };
 
