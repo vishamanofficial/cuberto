@@ -4,10 +4,11 @@ import toast from "react-hot-toast";
 import { AuthContext } from "../context/AuthContext";
 
 const UserProfile = () => {
+  const baseURL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8800";
   const { currentUser } = useContext(AuthContext);
   const [formData, setFormData] = useState({
     fullName: "",
-    email: "",
+    // email: "",
     phone: "",
   });
   const [editMode, setEditMode] = useState(false);
@@ -15,7 +16,7 @@ const UserProfile = () => {
   useEffect(() => {
     if (currentUser) {
       axios
-        .get("http://localhost:8800/api/users/me", { withCredentials: true })
+        .get(`${baseURL}/api/users/me`, { withCredentials: true })
         .then((res) =>
           setFormData({
             fullName: res.data.fullName,
@@ -35,7 +36,7 @@ const UserProfile = () => {
   const handleSubmit = async () => {
     try {
       await axios.put(
-        `http://localhost:8800/api/users/${currentUser._id}`,
+        `${baseURL}/api/users/${currentUser._id}`,
         formData,
         { withCredentials: true }
       );
@@ -62,7 +63,7 @@ const UserProfile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white p-6 pt-24">
+    <div className=" bg-black text-white p-6 pt-24">
       <div className="max-w-xl mx-auto border border-[#FBD3AF] rounded-xl p-6 shadow-md bg-black">
         <h2 className="text-2xl font-bold mb-6 text-center text-[#FBD3AF]">
           My Profile
@@ -78,13 +79,13 @@ const UserProfile = () => {
                 placeholder="Full Name"
                 className="w-full bg-[#1a1a1a] text-white placeholder-gray-400 border border-[#FBD3AF] px-4 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-[#FBD3AF]"
               />
-              <input
+              {/* <input
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="Email"
                 className="w-full bg-[#1a1a1a] text-white placeholder-gray-400 border border-[#FBD3AF] px-4 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-[#FBD3AF]"
-              />
+              /> */}
               <input
                 name="phone"
                 value={formData.phone}

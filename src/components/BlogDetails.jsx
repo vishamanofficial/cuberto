@@ -3,13 +3,15 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 
 const BlogDetails = () => {
+  const baseURL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8800";
+
   const { slug } = useParams();
   const [blog, setBlog] = useState(null);
 
   useEffect(() => {
     const fetchBlog = async () => {
       try {
-        const res = await axios.get(`http://localhost:8800/api/blogs/${slug}`);
+        const res = await axios.get(`${baseURL}/api/blogs/${slug}`);
         setBlog(res.data);
       } catch (err) {
         console.error("Failed to load blog", err);
@@ -34,7 +36,7 @@ const BlogDetails = () => {
 
         {blog.coverImage && (
           <img
-            src={`http://localhost:8800${blog.coverImage}`}
+            src={`${baseURL}${blog.coverImage}`}
             alt={blog.title}
             className="w-full max-h-[300px] object-cover rounded-lg mb-6 shadow-md"
           />

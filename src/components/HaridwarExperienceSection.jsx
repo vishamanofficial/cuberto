@@ -1,6 +1,8 @@
 import React from "react";
 
 const HaridwarExperienceSection = () => {
+  const baseURL = import.meta.env.VITE_API_BASE_URL;
+
   return (
     <div className="bg-gradient-to-br from-black via-[#0f0f0f] to-black text-white py-24 px-6 md:px-10">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
@@ -26,7 +28,7 @@ const HaridwarExperienceSection = () => {
         <div className="grid grid-cols-1 gap-4">
           <div className="overflow-hidden rounded-xl shadow-lg">
             <img
-              src="https://images.pexels.com/photos/1655056/pexels-photo-1655056.jpeg"
+              src={`${baseURL}/room_images/08.jpg`}
               alt="Har Ki Pauri"
               className="w-full h-[320px] object-cover rounded-xl"
             />
@@ -34,14 +36,14 @@ const HaridwarExperienceSection = () => {
           <div className="grid grid-cols-2 gap-4">
             <div className="overflow-hidden rounded-xl shadow-md">
               <img
-                src="https://images.pexels.com/photos/14963789/pexels-photo-14963789.jpeg"
+                src={`${baseURL}/room_images/09.jpg`}
                 alt="Ganga Aarti"
                 className="w-full h-48 object-cover rounded-xl"
               />
             </div>
             <div className="overflow-hidden rounded-xl shadow-md">
               <img
-                src="https://images.pexels.com/photos/6836123/pexels-photo-6836123.jpeg"
+                src={`${baseURL}/room_images/10.jpg`}
                 alt="Haridwar Ghats"
                 className="w-full h-48 object-cover rounded-xl"
               />

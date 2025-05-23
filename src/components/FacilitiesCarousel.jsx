@@ -1,17 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+const baseURL = import.meta.env.VITE_API_BASE_URL;
 
 const carouselItems = [
   {
-    title: 'Swimming Pool',
-    image: 'https://images.unsplash.com/photo-1623718649591-311775a30c43?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aG90ZWwlMjBwb29sfGVufDB8fDB8fHww', // Replace with actual image
+    title: "",
+    image: `${baseURL}/room_images/11.jpg`,
   },
   {
-    title: 'Table Tennis',
-    image: 'https://plus.unsplash.com/premium_photo-1664304787554-8191fb0832fb?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8dGFibGUlMjB0ZW5uaXN8ZW58MHx8MHx8fDA%3D', // Replace with actual image
+    title: "",
+    image: `${baseURL}/room_images/12.jpg`,
   },
   {
-    title: 'Indoor Spa',
-    image: 'https://plus.unsplash.com/premium_photo-1675744019064-55e970095927?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8aW5kb29yJTIwc3BhfGVufDB8fDB8fHww', // Replace with actual image
+    title: "",
+    image: `${baseURL}/room_images/13.jpg`,
   },
 ];
 
@@ -51,7 +52,7 @@ const FacilitiesCarousel = () => {
             key={idx}
             onClick={() => handleDotClick(idx)}
             className={`w-6 h-1 rounded-full transition-all duration-300 ${
-              activeIndex === idx ? 'bg-yellow-300' : 'bg-gray-700'
+              activeIndex === idx ? "bg-yellow-300" : "bg-gray-700"
             }`}
           ></button>
         ))}

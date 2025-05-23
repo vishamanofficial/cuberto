@@ -6,12 +6,14 @@ import { Link } from "react-router-dom";
 import "swiper/css";
 
 const RoomShowcaseCarousel = () => {
+  const baseURL = import.meta.env.VITE_API_BASE_URL;
+
   const [rooms, setRooms] = useState([]);
 
   useEffect(() => {
     const fetchRooms = async () => {
       try {
-        const res = await axios.get("http://localhost:8800/api/rooms");
+        const res = await axios.get(`${baseURL}/api/rooms`);
         setRooms(res.data);
       } catch (error) {
         console.error("Failed to fetch rooms:", error);
@@ -23,7 +25,7 @@ const RoomShowcaseCarousel = () => {
 
   return (
     <div className="bg-black text-white py-16 px-4">
-      <h2 className="text-white text-5xl md:text-6xl font-serif text-center mb-12">
+      <h2 className="text-white text-5xl md:text-6xl font-serif text-center mb-12 pt-4">
         Our Rooms
       </h2>
 
@@ -53,8 +55,8 @@ const RoomShowcaseCarousel = () => {
                   <img
                     src={
                       room.images?.[0]
-                        ? `http://localhost:8800${room.images[0]}`
-                        : "https://images.pexels.com/photos/258154/pexels-photo-258154.jpeg"
+                        ? `${baseURL}${room.images[0]}`
+                        : `${baseURL}/room_images/08.jpg`
                     }
                     alt={room.title}
                     className="w-full h-[300px] object-cover rounded-md"
@@ -64,7 +66,8 @@ const RoomShowcaseCarousel = () => {
                     <h3 className="text-2xl italic font-light">{room.title}</h3>
 
                     <p className="mt-1 text-sm tracking-wide uppercase text-gray-300">
-                      {room.roomType} · {room.bedType} Bed · Max {room.maxPeople} People
+                      {room.roomType} · {room.bedType} Bed · Max{" "}
+                      {room.maxPeople} People
                     </p>
 
                     <p className="mt-2 text-sm text-gray-400">

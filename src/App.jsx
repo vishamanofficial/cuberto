@@ -13,18 +13,29 @@ import UserProfile from "./components/UserProfile";
 import UserBookings from "./components/UserBookings";
 import RoomDetails from "./pages/hotel/RoomDetails";
 import BookYourStay from "./components/BookYourStay";
-import BlogDetails from "./components/BlogDetails"; // ✅ import added
+import BlogDetails from "./components/BlogDetails";
+import OurRooms from "./components/OurRooms";
+import RestaurantExperience from "./components/RestaurantExperience";
+import TermsAndConditions from "./components/TermsAndConditions";
+import PrivacyPolicy from "./components/PrivacyPolicy";
 
 const App = () => {
-  useEffect(() => {
-    const scroll = new LocomotiveScroll();
-  }, []);
+  // useEffect(() => {
+  //   const scroll = new LocomotiveScroll();
+  // }, []);
 
   return (
     <>
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
+
+        <Route path="/our-rooms" element={<OurRooms/>} />
+        <Route path="/restaurant" element={<RestaurantExperience />} />
+        <Route path="/terms" element={<TermsAndConditions />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+
+
         <Route path="/available-rooms" element={<AvailableRooms />} />
         <Route path="/rooms/:id" element={<RoomDetails />} />
         <Route path="/book-your-stay" element={<BookYourStay />} />

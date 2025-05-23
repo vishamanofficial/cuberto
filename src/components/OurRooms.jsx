@@ -1,0 +1,69 @@
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { Link } from "react-router-dom";
+
+const OurRooms = () => {
+  const baseURL = import.meta.env.VITE_API_BASE_URL;
+  const [rooms, setRooms] = useState([]);
+
+  useEffect(() => {
+    const fetchRooms = async () => {
+      try {
+        const res = await axios.get(`${baseURL}/api/rooms`);
+        setRooms(res.data);
+      } catch (error) {
+        console.error("Failed to fetch rooms:", error);
+      }
+    };
+
+    fetchRooms();
+  }, []);
+
+  return (
+    <div className="bg-black text-white py-16 px-4">
+      <h2 className="text-white text-5xl md:text-6xl font-serif text-center mb-12 pt-4">
+        Our Rooms
+      </h2>
+
+      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10">
+        {rooms.map((room) => (
+          <Link to={`/rooms/${room._id}`} key={room._id}>
+            <div className="bg-black border border-gray-700 p-4 rounded-lg">
+              <img
+                src={
+                  room.images?.[0]
+                    ? `${baseURL}${room.images[0]}`
+                    : `${baseURL}/room_images/08.jpg`
+                }
+                alt={room.title}
+                className="w-full h-[300px] object-cover rounded-md"
+              />
+
+              <div className="mt-4">
+                <h3 className="text-2xl italic font-light">{room.title}</h3>
+
+                <p className="mt-1 text-sm tracking-wide uppercase text-gray-300">
+                  {room.roomType} · {room.bedType} Bed · Max {room.maxPeople} People
+                </p>
+
+                <p className="mt-2 text-sm text-gray-400">
+                  {room.description}
+                </p>
+
+                {room.amenities?.length > 0 && (
+                  <p className="mt-2 text-sm text-gray-400 italic">
+                    Amenities: {room.amenities.join(", ")}
+                  </p>
+                )}
+
+                <p className="mt-2 text-3xl font-light">₹{room.price}</p>
+              </div>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default OurRooms;

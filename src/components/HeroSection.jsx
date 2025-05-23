@@ -2,7 +2,7 @@ import React from 'react';
 
 const HeroSection = () => {
   return (
-    <section className="bg-black text-white min-h-screen flex items-center justify-center px-6 py-20">
+    <section className="bg-black text-white min-h-[70vh] flex items-center justify-center px-6 py-20">
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
         {/* Left Side */}
         <div>

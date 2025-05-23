@@ -5,22 +5,26 @@ import "swiper/css";
 import "swiper/css/navigation";
 
 const HighlightsSection = () => {
+  const baseURL = import.meta.env.VITE_API_BASE_URL;
+
   const highlights = [
     {
       title: "Located in the Heart of the City",
-      image: "https://images.pexels.com/photos/261102/pexels-photo-261102.jpeg",
+      image: `${baseURL}/room_images/08.jpg`,
       description:
         "Nestled in Haridwar’s cultural hub, Amartarangini offers a tranquil yet accessible stay experience.",
     },
     {
       title: "Elegant Dining Experiences",
-      image: "https://images.pexels.com/photos/261102/pexels-photo-261102.jpeg",
+      image: `${baseURL}/room_images/04.jpg`,
+
       description:
         "Nestled in Haridwar’s cultural hub, Amartarangini offers a tranquil yet accessible stay experience.",
     },
     {
       title: "Concierge & Hospitality",
-      image: "https://images.pexels.com/photos/261102/pexels-photo-261102.jpeg",
+      image: `${baseURL}/room_images/10.jpg`,
+
       description:
         "Nestled in Haridwar’s cultural hub, Amartarangini offers a tranquil yet accessible stay experience.",
     },
@@ -33,7 +37,8 @@ const HighlightsSection = () => {
           — HIGHLIGHTS —
         </h2>
         <p className="text-gray-300 max-w-2xl mx-auto font-light text-lg">
-          Discover the exceptional experiences that make your stay unforgettable.
+          Discover the exceptional experiences that make your stay
+          unforgettable.
         </p>
       </div>
 

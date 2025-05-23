@@ -6,6 +6,8 @@ import "react-date-range/dist/theme/default.css";
 import { useNavigate } from "react-router-dom";
 
 const BookYourStay = () => {
+  const baseURL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8800";
+
   const [date, setDate] = useState([
     {
       startDate: new Date(),
@@ -42,8 +44,7 @@ const BookYourStay = () => {
     <div
       className="w-full h-screen bg-cover bg-center text-white relative"
       style={{
-        backgroundImage:
-          "url(https://images.pexels.com/photos/258154/pexels-photo-258154.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2)",
+        backgroundImage: `url("${baseURL}/room_images/stay.jpg")`,
       }}
     >
       <div className="absolute inset-0 bg-black bg-opacity-50 z-0" />
@@ -65,7 +66,9 @@ const BookYourStay = () => {
           <div className="relative col-span-2" ref={dateRef}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm text-white mb-2">Check-in</label>
+                <label className="block text-sm text-white mb-2">
+                  Check-in
+                </label>
                 <div
                   className="border border-white px-4 py-2 w-full text-white bg-transparent cursor-pointer"
                   onClick={() => setOpenDate(!openDate)}
@@ -74,7 +77,9 @@ const BookYourStay = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-white mb-2">Check-out</label>
+                <label className="block text-sm text-white mb-2">
+                  Check-out
+                </label>
                 <div
                   className="border border-white px-4 py-2 w-full text-white bg-transparent cursor-pointer"
                   onClick={() => setOpenDate(!openDate)}

@@ -9,6 +9,8 @@ import { AuthContext } from "../../context/AuthContext.jsx";
 import AuthModal from "../../components/AuthModal";
 import toast, { Toaster } from "react-hot-toast";
 
+const baseURL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8800";
+
 const isRoomAvailable = (room, startDate, endDate) => {
   return room.roomNumbers.some((roomNumber) =>
     roomNumber.unavailableDates.every(
@@ -38,7 +40,7 @@ const AvailableRooms = () => {
     const fetchRooms = async () => {
       try {
         setLoading(true);
-        const res = await axios.get("http://localhost:8800/api/rooms");
+        const res = await axios.get(`${baseURL}/api/rooms`);
         setRooms(res.data);
       } catch (err) {
         toast.error("Failed to load rooms");
@@ -81,7 +83,7 @@ const AvailableRooms = () => {
     }
 
     try {
-      const res = await axios.post("http://localhost:8800/api/bookings/check-availability", {
+      const res = await axios.post(`${baseURL}/api/bookings/check-availability`, {
         roomId: room._id,
         startDate: date[0].startDate,
         endDate: date[0].endDate,
@@ -172,8 +174,8 @@ const AvailableRooms = () => {
                   <img
                     src={
                       room.images?.[0]
-                        ? `http://localhost:8800${room.images[0]}`
-                        : "https://images.pexels.com/photos/258154/pexels-photo-258154.jpeg"
+                        ? `${baseURL}${room.images[0]}`
+                        : `${baseURL}/room_images/08.jpg`
                     }
                     alt={room.title}
                     className="w-full h-[300px] object-cover rounded-md"

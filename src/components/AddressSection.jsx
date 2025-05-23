@@ -24,7 +24,7 @@ const AddressSection = () => {
             <span className="italic font-serif">holidays with us</span>
           </p>
           <p className="mb-6">
-            38701 Ukraine, Poltava Region, Sosnivka village, Sosnova Street, 1
+            Haridwar
           </p>
           <p className="italic font-serif underline underline-offset-4 decoration-1">
             Book your stay

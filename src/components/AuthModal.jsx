@@ -4,6 +4,8 @@ import toast, { Toaster } from "react-hot-toast";
 import { AuthContext } from "../context/AuthContext.jsx";
 
 const AuthModal = ({ onClose }) => {
+  const baseURL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8800";
+
   const [mode, setMode] = useState("login"); // login | signup | forgot
   const [signupStep, setSignupStep] = useState(1); // Step 1, 2, 3 for signup
   const [formData, setFormData] = useState({
@@ -27,7 +29,7 @@ const AuthModal = ({ onClose }) => {
       return toast.error("Please fill all fields");
     }
     try {
-      await axios.post("http://localhost:8800/api/auth/send-otp", {
+      await axios.post(`${baseURL}/api/auth/send-otp`, {
         contact: formData.email,
       });
       setOtpSent(true);
@@ -40,7 +42,7 @@ const AuthModal = ({ onClose }) => {
 
   const handleVerifyOtp = async () => {
     try {
-      const res = await axios.post("http://localhost:8800/api/auth/verify-otp", {
+      const res = await axios.post(`${baseURL}/api/auth/verify-otp`, {
         contact: formData.email,
         otp: formData.otp,
       });
@@ -57,11 +59,11 @@ const AuthModal = ({ onClose }) => {
   const handleRegister = async () => {
     try {
       const { otp, ...formWithoutOtp } = formData;
-      await axios.post("http://localhost:8800/api/auth/register", formWithoutOtp, {
+      await axios.post(`${baseURL}/api/auth/register`, formWithoutOtp, {
         withCredentials: true,
       });
 
-      const userRes = await axios.get("http://localhost:8800/api/users/me", {
+      const userRes = await axios.get(`${baseURL}/api/users/me`, {
         withCredentials: true,
       });
 
@@ -83,7 +85,7 @@ const AuthModal = ({ onClose }) => {
       return toast.error("All fields are required");
 
     try {
-      await axios.post("http://localhost:8800/api/auth/reset-password", {
+      await axios.post(`${baseURL}/api/auth/reset-password`, {
         contact: email,
         otp,
         newPassword: password,
@@ -103,7 +105,7 @@ const AuthModal = ({ onClose }) => {
       return toast.error("Please enter both email and password");
 
     try {
-      await axios.post("http://localhost:8800/api/auth/login", { email, password }, {
+      await axios.post(`${baseURL}/api/auth/login`, { email, password }, {
         withCredentials: true,
       });
 

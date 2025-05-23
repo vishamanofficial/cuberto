@@ -8,6 +8,7 @@ import EventNoteIcon from "@mui/icons-material/EventNote";
 import LogoutIcon from "@mui/icons-material/Logout";
 
 function Navbar() {
+  const baseURL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8800";
   const navigate = useNavigate();
   const [isDrawerOpen, setDrawerOpen] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -43,10 +44,11 @@ function Navbar() {
 
   const handleLogout = async () => {
     try {
-      await fetch("http://localhost:8800/api/auth/logout", {
-        method: "POST",
-        credentials: "include",
-      });
+      await fetch(`${baseURL}/api/auth/logout`, {
+  method: "POST",
+  credentials: "include",
+});
+
       setCurrentUser(null);
     } catch (err) {
       console.error("Logout failed", err);

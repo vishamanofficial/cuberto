@@ -1,6 +1,7 @@
 import React from "react";
 
 const HotelExperience = () => {
+  const baseURL = import.meta.env.VITE_API_BASE_URL;
   return (
     <section className="bg-[#fbd3af] font-serif px-8 py-16 md:px-24 text-black">
       <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
@@ -22,9 +23,9 @@ const HotelExperience = () => {
         {/* Top Right Image */}
         <div className="w-full">
           <img
-            src="https://images.pexels.com/photos/262047/pexels-photo-262047.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+            src={`${baseURL}/room_images/02.jpg`}
             alt="Restaurant Interior"
-            className="rounded-lg shadow-lg w-full h-auto object-cover"
+            className="rounded-lg shadow-lg w-full h-[70vh] object-cover"
           />
         </div>
       </div>
@@ -34,7 +35,7 @@ const HotelExperience = () => {
         {/* Bottom Left Image */}
         <div>
           <img
-            src="https://images.pexels.com/photos/2096983/pexels-photo-2096983.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+            src={`${baseURL}/room_images/03.jpg`}
             alt="Table setup"
             className="rounded-lg shadow-lg w-full h-auto object-cover"
           />
@@ -52,7 +53,7 @@ const HotelExperience = () => {
 
           {/* Chef Image */}
           <img
-            src="https://images.pexels.com/photos/8629088/pexels-photo-8629088.jpeg?auto=compress&cs=tinysrgb&w=600"
+            src={`${baseURL}/room_images/04.jpg`}
             alt="Chef"
             className="rounded-lg shadow-md w-full h-auto object-cover"
           />

@@ -5,13 +5,14 @@ import { format } from "date-fns";
 import toast from "react-hot-toast";
 
 const UserBookings = () => {
+  const baseURL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8800";
   const { currentUser } = useContext(AuthContext);
   const [bookings, setBookings] = useState([]);
 
   useEffect(() => {
     if (currentUser?._id) {
       axios
-        .get(`http://localhost:8800/api/bookings/user/${currentUser._id}`, {
+        .get(`${baseURL}/api/bookings/user/${currentUser._id}`, {
           withCredentials: true,
         })
         .then((res) => setBookings(res.data))

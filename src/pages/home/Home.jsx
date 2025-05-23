@@ -12,11 +12,13 @@ import BlogList from "../../components/BlogList";
 import DiningSection from "../../components/DiningSection";
 import HaridwarExperienceSection from "../../components/HaridwarExperienceSection";
 import FacilitiesIconSection from "../../components/FacilitiesIconSection";
+import VideoSection from "../../components/VideoSection";
 
 const Home = () => {
   return (
     <div>
       <LandingPage />
+      {/* <VideoSection/> */}
       <HeroSection />
       <RoomShowcaseCarousel />
       <HotelExperience />

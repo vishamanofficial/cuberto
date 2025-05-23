@@ -12,8 +12,8 @@ import ApartmentIcon from "@mui/icons-material/Apartment";
 import LandscapeIcon from "@mui/icons-material/Landscape";
 import { useNavigate } from "react-router-dom";
 
-
 const RoomDetails = () => {
+  const baseURL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8800";
   const navigate = useNavigate();
   const handleNavigate = (path) => {
     navigate(path);
@@ -25,7 +25,7 @@ const RoomDetails = () => {
   useEffect(() => {
     const fetchRoom = async () => {
       try {
-        const res = await axios.get(`http://localhost:8800/api/rooms/${id}`);
+        const res = await axios.get(`${baseURL}/api/rooms/${id}`);
         setRoom(res.data);
       } catch (err) {
         console.error("Failed to fetch room details", err);
@@ -49,7 +49,7 @@ const RoomDetails = () => {
       <div
         className="h-[100vh] bg-cover bg-center flex flex-col justify-center items-center text-center"
         style={{
-          backgroundImage: `url(http://localhost:8800${room.images?.[0]})`,
+          backgroundImage: `url(${baseURL}${room.images?.[0]})`,
         }}
       >
         <p className="text-white tracking-wide uppercase text-sm md:text-base">
@@ -70,8 +70,8 @@ const RoomDetails = () => {
           <img
             src={
               room.images?.[1]
-                ? `http://localhost:8800${room.images[1]}`
-                : "https://images.pexels.com/photos/261102/pexels-photo-261102.jpeg"
+                ? `${baseURL}${room.images[1]}`
+                : `${baseURL}/room_images/08.jpg`
             }
             alt="Room Detail"
             className="w-full rounded-lg shadow-md"
@@ -114,11 +114,11 @@ const RoomDetails = () => {
             </p>
 
             <button
-            onClick={() => handleNavigate("/book-your-stay")}
-            className="italic text-[#FBD3AF] cursor-pointer underline tracking-widest text-sm hover:text-white transition"
-          >
-            Book Your Stay
-          </button>
+              onClick={() => handleNavigate("/book-your-stay")}
+              className="italic text-[#FBD3AF] cursor-pointer underline tracking-widest text-sm hover:text-white transition"
+            >
+              Book Your Stay
+            </button>
           </div>
         </div>
       </div>

@@ -7,6 +7,8 @@ import toast, { Toaster } from "react-hot-toast";
 import { AuthContext } from "../../context/AuthContext";
 
 const BookingConfirmation = () => {
+  const baseURL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8800";
+
   const location = useLocation();
   const navigate = useNavigate();
   const { room, date, options } = location.state || {};
@@ -63,7 +65,7 @@ const handleSubmit = async () => {
     const bookingDates = getAllDatesInRange(start, end);
 
     const res = await axios.post(
-      "http://localhost:8800/api/bookings",
+      `${baseURL}/api/bookings`,
       {
         roomId: room._id,
         startDate: start,

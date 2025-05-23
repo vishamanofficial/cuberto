@@ -9,13 +9,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Matter:wght@100;300;400;500;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Flex:wght@100;300;400;500;700&display=swap');
 
-/* Firefox */
+
+
+
+/* 
 * {
   scrollbar-width: thin;
   scrollbar-color: #FBD3AF transparent;
 }
 
-/* Chrome */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -25,4 +27,4 @@
 }
 ::-webkit-scrollbar-track {
   background: transparent;
-}
+} */
